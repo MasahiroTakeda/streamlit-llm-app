@@ -8,9 +8,20 @@ from langchain.schema import SystemMessage, HumanMessage
 load_dotenv()
 
 # OpenAI API キーの設定（Streamlit Secretsまたは環境変数から取得）
-openai_api_key = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
+try:
+    # Streamlit Secretsから取得を試行
+    openai_api_key = st.secrets.get("OPENAI_API_KEY")
+except:
+    # Streamlit Secretsが利用できない場合は環境変数から取得
+    openai_api_key = None
+
+# 環境変数からも取得を試行
+if not openai_api_key:
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+
 if not openai_api_key:
     st.error("OpenAI API キーが設定されていません。")
+    st.info("`.env` ファイルまたはStreamlit Secretsに `OPENAI_API_KEY` を設定してください。")
     st.stop()
 
 # Streamlitページ設定
