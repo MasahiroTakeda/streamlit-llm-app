@@ -1,10 +1,17 @@
 import streamlit as st
+import os
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain.schema import SystemMessage, HumanMessage
 
-# 環境変数を読み込み
+# 環境変数を読み込み（ローカル環境用）
 load_dotenv()
+
+# OpenAI API キーの設定（Streamlit Secretsまたは環境変数から取得）
+openai_api_key = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
+if not openai_api_key:
+    st.error("OpenAI API キーが設定されていません。")
+    st.stop()
 
 # Streamlitページ設定
 st.set_page_config(page_title="LLM Chat App", page_icon="🤖")
@@ -16,7 +23,7 @@ st.write("専門家を選択して、質問を入力してください。選択�
 # LLMの初期化
 @st.cache_resource
 def initialize_llm():
-    return ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+    return ChatOpenAI(model_name="gpt-4o-mini", temperature=0, api_key=openai_api_key)
 
 llm = initialize_llm()
 
